@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jboss.weld.examples</groupId>
+        <artifactId>weld-examples-parent</artifactId>
+        <version>2.2.6-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <groupId>org.jboss.weld.examples</groupId>
+    <artifactId>dices</artifactId>
+    <packaging>war</packaging>
+    <name>Weld Examples: Dices (AngularJS)</name>
+
+    <url>http://weld.cdi-spec.org</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <distribution>repo</distribution>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+        </license>
+    </licenses>
+
+    <properties>
+        <resteasy.version>2.3.7.Final</resteasy.version>
+        <cdi.version>1.2</cdi.version>
+        <jboss.servlet-api-3.1.version>1.0.0.Final</jboss.servlet-api-3.1.version>
+    </properties>
+
+    <!-- Common dependencies only -->
+    <dependencies>
+
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>${cdi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.spec.javax.servlet</groupId>
+            <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+            <version>${jboss.servlet-api-3.1.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.weld.servlet</groupId>
+            <artifactId>weld-servlet</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>${resteasy.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-cdi</artifactId>
+            <version>${resteasy.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson-provider</artifactId>
+            <version>${resteasy.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+
+        <profile>
+            <id>gae</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.google.appengine</groupId>
+                    <artifactId>appengine-api-1.0-sdk</artifactId>
+                    <version>1.9.11</version>
+                </dependency>
+
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <webResources>
+                                <resource>
+                                    <directory>src/main/webapp</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </webResources>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>2.4</version>
+                        <configuration>
+                            <archiveClasses>true</archiveClasses>
+                            <webResources>
+                                <!-- in order to interpolate version from pom into appengine-web.xml -->
+                                <resource>
+                                    <directory>${basedir}/src/main/webapp</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </webResources>
+
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>com.google.appengine</groupId>
+                        <artifactId>appengine-maven-plugin</artifactId>
+                        <version>1.9.11</version>
+                        <configuration>
+                            <enableJarClasses>false</enableJarClasses>
+                            <!-- Comment in the below snippet to bind to all IPs instead of just localhost -->
+                            <!-- address>0.0.0.0</address>
+                            <port>8080</port -->
+                            <!-- Comment in the below snippet to enable local debugging with a remove debugger
+                                 like those included with Eclipse or IntelliJ -->
+                            <!-- jvmFlags>
+                              <jvmFlag>-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n</jvmFlag>
+                            </jvmFlags -->
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <build>
+        <finalName>dices</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <!--warSourceExcludes>WEB-INF/classes/**,WEB-INF/lib/**</warSourceExcludes-->
+                          <webResources>
+
+                              <webResource>
+                                  <directory>src/main/webapp</directory>
+                                  <includes>
+                                      <include>WEB-INF/**</include>
+                                  </includes>
+                              </webResource>
+                          </webResources>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
+
