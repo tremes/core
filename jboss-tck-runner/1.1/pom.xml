@@ -142,6 +142,7 @@
                         </configuration>
                     </execution>
                 </executions>
+                <version>2.9</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
