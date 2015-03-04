@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    version="6" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_6.xsd">
+    version="7" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/application_7.xsd">
     <application-name>test-app</application-name>
+    <initialize-in-order>true</initialize-in-order>
+
+    <module>
+        <java>test-ejb3.jar</java>
+    </module>
     <module>
         <web>
-            <web-uri>test1.war</web-uri>
-            <context-root>test1</context-root>
+            <web-uri>application.war</web-uri>
+            <context-root>app1</context-root>
         </web>
     </module>
     <module>
         <web>
-            <web-uri>test2.war</web-uri>
-            <context-root>test2</context-root>
+            <web-uri>application2.war</web-uri>
+            <context-root>app2</context-root>
         </web>
     </module>
 </application>

@@ -18,13 +18,13 @@ package org.jboss.weld.tests.accessibility;
 
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 
-import javax.enterprise.inject.spi.Extension;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.BeanArchive;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -38,30 +38,36 @@ public class EarAccessibilityTest {
     @Deployment(testable = false)
     public static Archive<?> getDeployment() {
         // setup shared libraries
-        JavaArchive sharedInterfaceBundle = create(JavaArchive.class).addClasses(Animal.class, AbstractTestListener.class);
-        JavaArchive sharedExtensionLibrary1 = createSimpleExtensionArchive(SharedLibrary1Extension.class,
-                SharedLibrary1Impl.class);
-        JavaArchive sharedExtensionLibrary2 = createSimpleExtensionArchive(SharedLibrary2Extension.class,
-                SharedLibrary2Impl.class);
+        // JavaArchive sharedInterfaceBundle = create(JavaArchive.class).addClasses(Animal.class, AbstractTestListener.class);
+        // JavaArchive sharedExtensionLibrary1 = createSimpleExtensionArchive(SharedLibrary1Extension.class,
+        //          SharedLibrary1Impl.class);
+        // JavaArchive sharedExtensionLibrary2 = createSimpleExtensionArchive(SharedLibrary2Extension.class,
+        //        SharedLibrary2Impl.class);
         // setup war 1
-        JavaArchive library1 = createSimpleExtensionArchive(Library1Extension.class, Library1Impl.class);
-        WebArchive war1 = create(WebArchive.class, "test1.war").addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml").addClasses(
-                War1Impl.class, War1Listener.class).addAsLibrary(library1);
+        //JavaArchive library1 = createSimpleExtensionArchive(Library1Extension.class, Library1Impl.class);
+        WebArchive war1 = create(WebArchive.class, "application.war").addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                .addAsWebResource(EarAccessibilityTest.class.getPackage(), "index.html", "index.html")
+                .addAsWebResource(EarAccessibilityTest.class.getPackage(), "home.xhtml", "home.xhtml")
+                .addAsWebInfResource(EarAccessibilityTest.class.getPackage(), "web.xml", "web.xml")
+                .addAsWebInfResource(EarAccessibilityTest.class.getPackage(), "faces-config.xml", "faces-config.xml").addClasses(
+                        ReqTestBean1.class, TestServlet.class).setManifest(new StringAsset("Manifest-Version: 1.0\nClass-Path: test-ejb3.jar\n"));
         // setup war 2
-        JavaArchive library2 = createSimpleExtensionArchive(Library2Extension.class, Library2Impl.class);
-        WebArchive war2 = create(WebArchive.class, "test2.war").addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml").addClasses(
-                War2Impl.class, War2Listener.class).addAsLibrary(library2);
+        //  JavaArchive library2 = createSimpleExtensionArchive(Library2Extension.class, Library2Impl.class);
+        WebArchive war2 = create(WebArchive.class, "application2.war").addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml").addClasses(
+                ReqTestBean2.class, TestServlet.class).setManifest(new StringAsset("Manifest-Version: 1.0\nClass-Path: test-ejb3.jar\n"));
+
 
         // setup the entire application
+        JavaArchive myEjbModule = createSimpleExtensionArchive(TestEjb.class, TestRemoteInterface.class, TestLocalInterface.class);
         EnterpriseArchive ear = create(EnterpriseArchive.class).addAsModules(war1, war2)
-                .addAsLibraries(sharedInterfaceBundle, sharedExtensionLibrary1, sharedExtensionLibrary2)
-                .addAsManifestResource(EarAccessibilityTest.class.getPackage(), "application.xml", "application.xml");
+                //.addAsLibraries(sharedInterfaceBundle, sharedExtensionLibrary1, sharedExtensionLibrary2)
+                .addAsManifestResource(EarAccessibilityTest.class.getPackage(), "application.xml", "application.xml")
+                .addAsModule(myEjbModule);
         return ear;
     }
 
-    protected static JavaArchive createSimpleExtensionArchive(Class<? extends Extension> extension, Class<?>... classes) {
-        return create(JavaArchive.class).addClass(extension).addClasses(classes)
-                .addAsServiceProvider(Extension.class, extension);
+    protected static JavaArchive createSimpleExtensionArchive(Class<?>... classes) {
+        return create(BeanArchive.class, "test-ejb3.jar").addClasses(classes);
     }
 
     @Test
