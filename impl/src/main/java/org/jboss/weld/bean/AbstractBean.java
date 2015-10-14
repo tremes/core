@@ -159,16 +159,16 @@ public abstract class AbstractBean<T, S> extends RIBean<T> {
         // Override qualifiers and the bean name
         Set<Annotation> qualifiers = new HashSet<Annotation>();
         qualifiers.addAll(attributes().getQualifiers());
-        if (qualifiers.contains(DefaultLiteral.INSTANCE) && !getAnnotated().isAnnotationPresent(DefaultLiteral.INSTANCE.annotationType())) {
-            // @Default is not declared explicitly
-            qualifiers.remove(DefaultLiteral.INSTANCE);
-        }
         String name = attributes().getName();
         for (AbstractBean<?, ?> specializedBean : getSpecializedBeans()) {
             qualifiers.addAll(specializedBean.getQualifiers());
             if (specializedBean.getName() != null) {
                 name = specializedBean.getName();
             }
+        }
+        if (qualifiers.contains(DefaultLiteral.INSTANCE) && !getAnnotated().isAnnotationPresent(DefaultLiteral.INSTANCE.annotationType())) {
+            // @Default is not declared explicitly
+            qualifiers.remove(DefaultLiteral.INSTANCE);
         }
         setAttributes(new ImmutableBeanAttributes<T>(qualifiers, name, attributes()));
     }

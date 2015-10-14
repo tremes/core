@@ -60,6 +60,11 @@ public class SpecializingBeanQualifiersTest {
         testQualifiersOfSpecializedBean(SpecializationBean.class, MockSpecializationBean.class);
     }
 
+    @Test
+    public void testQuailifiersInSpecializingClassesHierarchy() {
+        testQualifiersOfSpecializedBean(Material.class, Granite.class);
+    }
+
     private void testQualifiersOfSpecializedBean(Class<?> specializedClass, Class<?> specializingClass) {
         Set<Bean<?>> specializationBeans = beanManager.getBeans(specializedClass, new Admin.AdminLiteral());
         assertEquals(1, specializationBeans.size());
