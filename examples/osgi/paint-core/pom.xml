@@ -35,9 +35,27 @@
         </dependency>
 
         <dependency>
+            <groupId>org.ops4j.pax.cdi</groupId>
+            <artifactId>pax-cdi-spi</artifactId>
+            <version>${pax.cdi.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.jboss.weld.examples</groupId>
             <artifactId>weld-osgi-paint-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>4.3.1</version>
         </dependency>
 
         <dependency>

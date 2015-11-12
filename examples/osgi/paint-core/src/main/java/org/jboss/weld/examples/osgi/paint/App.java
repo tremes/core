@@ -24,7 +24,7 @@ import javax.inject.Inject;
 
 import org.jboss.weld.examples.osgi.paint.api.ShapeProvider;
 import org.jboss.weld.examples.osgi.paint.gui.PaintFrame;
-import org.ops4j.pax.cdi.api.ContainerInitialized;
+import org.ops4j.pax.cdi.spi.ContainerInitialized;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
