@@ -17,6 +17,7 @@
 package org.jboss.weld.environment.se.test.resource;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.jboss.arquillian.container.se.api.ClassPath;
@@ -40,14 +41,15 @@ public class EEResourceInjectionIgnoredTest {
 
     @Deployment
     public static Archive<?> createTestArchive() {
-        return ClassPath.builder().add(ShrinkWrap.create(BeanArchive.class).addClasses(EEResourceInjectionIgnoredTest.class, Golf.class, Delta.class)).build();
+        return ClassPath.builder().add(ShrinkWrap.create(BeanArchive.class).addClasses(EEResourceInjectionIgnoredTest.class, Golf.class, Delta.class, GroovyClass.class)).build();
     }
 
     @Test
     public void testInjection() {
         try (WeldContainer container = new Weld().initialize()) {
             Golf golf = container.select(Golf.class).get();
-            assertNull(golf.getEntityManager());
+            GroovyClass groovyClass = container.select(GroovyClass.class).get();
+            assertNotNull(groovyClass);
             assertEquals(10, golf.getDelta().ping());
         }
     }
