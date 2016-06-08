@@ -126,26 +126,21 @@ public abstract class AbstractMemberProducer<X, T> extends AbstractProducer<T> {
 
     public void dispose(T instance) {
         if (disposalMethod != null) {
-            // CreationalContext is only created if we need it to obtain the receiver
-            // MethodInvocationStrategy takes care of creating CC for parameters, if needed
-            if (getAnnotated().isStatic()) {
-                disposalMethod.invokeDisposeMethod(null, instance, null);
-            } else {
-                WeldCreationalContext<X> ctx = null;
-                try {
-                    Object receiver = ContextualInstance.getIfExists(getDeclaringBean(), getBeanManager());
-                    if (receiver == null) {
-                        ctx = getBeanManager().createCreationalContext(null);
-                        // Create child CC so that a dependent reciever may be destroyed after the disposer method completes
-                        receiver = ContextualInstance.get(getDeclaringBean(), getBeanManager(), ctx.getCreationalContext(getDeclaringBean()));
-                    }
-                    if (receiver != null) {
-                        disposalMethod.invokeDisposeMethod(receiver, instance, ctx);
-                    }
-                } finally {
-                    if (ctx != null) {
-                        ctx.release();
-                    }
+            WeldCreationalContext<X> ctx = null;
+            Object receiver = ContextualInstance.getIfExists(getDeclaringBean(), getBeanManager());
+            if (receiver == null) {
+                ctx = getBeanManager().createCreationalContext(null);
+                // Create child CC so that a dependent reciever may be destroyed after the disposer method completes
+                receiver = ContextualInstance.get(getDeclaringBean(), getBeanManager(), ctx.getCreationalContext(getDeclaringBean()));
+            }
+
+            try {
+                if (receiver != null) {
+                    disposalMethod.invokeDisposeMethod(receiver, instance, ctx);
+                }
+            } finally {
+                if (ctx != null) {
+                    ctx.release();
                 }
             }
         }
@@ -165,8 +160,8 @@ public abstract class AbstractMemberProducer<X, T> extends AbstractProducer<T> {
     }
 
     private CreationalContext<X> getReceiverCreationalContext(CreationalContext<T> ctx) {
-        if(ctx instanceof WeldCreationalContext) {
-            return ((WeldCreationalContext<?>)ctx).getProducerReceiverCreationalContext(getDeclaringBean());
+        if (ctx instanceof WeldCreationalContext) {
+            return ((WeldCreationalContext<?>) ctx).getProducerReceiverCreationalContext(getDeclaringBean());
         } else {
             return getBeanManager().createCreationalContext(getDeclaringBean());
         }
@@ -198,7 +193,7 @@ public abstract class AbstractMemberProducer<X, T> extends AbstractProducer<T> {
         } else {
             if (getBean() == null) {
                 result.append(getAnnotated());
-        } else {
+            } else {
                 result.append(getBean());
             }
             result.append(" declared on ").append(getDeclaringBean());
