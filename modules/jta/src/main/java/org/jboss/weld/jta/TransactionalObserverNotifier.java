@@ -95,7 +95,7 @@ class TransactionalObserverNotifier extends ObserverNotifier {
                             .collect(Collectors.toList());
                     notifySyncObservers(filteredObservers, event, metadata, handler);
                 } else {
-                    throw e;
+                    throw new RuntimeException(e);
                 }
 
             }
