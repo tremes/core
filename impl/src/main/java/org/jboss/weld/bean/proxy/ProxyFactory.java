@@ -92,7 +92,7 @@ public class ProxyFactory<T> implements PrivilegedAction<T> {
 
     // Default proxy class name suffix
     public static final String PROXY_SUFFIX = "$Proxy$";
-    public static final String DEFAULT_PROXY_PACKAGE = "org.jboss.weld.proxies";
+    public static final String DEFAULT_PROXY_PACKAGE = "org.jboss.weld.dummy";
 
     private final Class<?> beanType;
     private final Set<Class<?>> additionalInterfaces = new LinkedHashSet<Class<?>>();
@@ -235,14 +235,14 @@ public class ProxyFactory<T> implements PrivilegedAction<T> {
                 if (superInterface.getPackage() == null) {
                     proxyPackage = DEFAULT_PROXY_PACKAGE;
                 } else {
-                    proxyPackage = superInterface.getPackage().getName();
+                    proxyPackage = DEFAULT_PROXY_PACKAGE;//superInterface.getPackage().getName();
                 }
             }
         } else {
             if (proxiedBeanType.getPackage() == null) {
                 proxyPackage = DEFAULT_PROXY_PACKAGE;
             } else {
-                proxyPackage = proxiedBeanType.getPackage().getName();
+                proxyPackage = DEFAULT_PROXY_PACKAGE;//proxiedBeanType.getPackage().getName();
             }
         }
         final String className;
@@ -476,7 +476,8 @@ public class ProxyFactory<T> implements PrivilegedAction<T> {
             ProtectionDomainCache cache = Container.instance(contextId).services().get(ProtectionDomainCache.class);
             domain = cache.getProtectionDomainForProxy(domain);
         }
-        Class<T> proxyClass = cast(ClassFileUtils.toClass(proxyClassType, classLoader, domain));
+        System.out.println(" ------------------- PROXY CLASS NAME " + proxyClassName);
+        Class<T> proxyClass = cast(ClassFileUtils.toClass(proxyClassType, classLoader, proxiedBeanType));
         BeanLogger.LOG.createdProxyClass(proxyClass, Arrays.toString(proxyClass.getInterfaces()));
         return proxyClass;
     }

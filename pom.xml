@@ -757,7 +757,7 @@
             <properties>
                 <!--This property will be added to surefire jvm args when needed. Due to reflection usage we have to to open
                 package java.lang in module java.base to unnamed module, hence making it available for reflection-->
-                <surefire.plugin.jdk9.args>--add-opens java.base/java.lang=ALL-UNNAMED </surefire.plugin.jdk9.args>
+                <surefire.plugin.jdk9.args>--permit-illegal-access</surefire.plugin.jdk9.args>
             </properties>
             <build>
                 <pluginManagement>

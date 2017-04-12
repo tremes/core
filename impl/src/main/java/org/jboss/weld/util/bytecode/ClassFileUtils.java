@@ -16,14 +16,14 @@
  */
 package org.jboss.weld.util.bytecode;
 
-
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.security.ProtectionDomain;
 
 import org.jboss.classfilewriter.ClassFile;
+import org.jboss.weld.dummy.DummyClass;
 
 /**
  * Utility class for loading a ClassFile into a classloader. This borrows
@@ -32,7 +32,8 @@ import org.jboss.classfilewriter.ClassFile;
  * @author Stuart Douglas
  */
 public class ClassFileUtils {
-    private static java.lang.reflect.Method defineClass1, defineClass2;
+    //    private static java.lang.reflect.Method defineClass1;
+    private static MethodHandles.Lookup lookup;
 
     private ClassFileUtils() {
     }
@@ -41,13 +42,15 @@ public class ClassFileUtils {
         try {
             AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
                 public Object run() throws Exception {
-                    Class<?> cl = Class.forName("java.lang.ClassLoader");
-                    final String name = "defineClass";
-                    defineClass1 = cl.getDeclaredMethod(name, new Class[]{String.class, byte[].class, int.class, int.class});
-                    defineClass1.setAccessible(true);
+                    //                    Class<?> cl = Class.forName("java.lang.invoke.MethodHandles.Lookup");
+                    //                    final String name = "defineClass";
 
-                    defineClass2 = cl.getDeclaredMethod(name, new Class[]{String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
-                    defineClass2.setAccessible(true);
+                    lookup = MethodHandles.publicLookup();
+                    //                    defineClass1 = cl.getDeclaredMethod(name, new Class[] { byte[].class });
+                    //                    defineClass1.setAccessible(true);
+                    //
+                    //                    defineClass2 = cl.getDeclaredMethod(name, new Class[]{String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
+                    //                    defineClass2.setAccessible(true);
                     return null;
                 }
             });
@@ -59,19 +62,19 @@ public class ClassFileUtils {
     /**
      * Converts the class to a <code>java.lang.Class</code> object. Once this
      * method is called, further modifications are not allowed any more.
-     * <p/>
-     * <p/>
+     * <p>
+     * <p>
      * The class file represented by the given <code>CtClass</code> is loaded by
      * the given class loader to construct a <code>java.lang.Class</code> object.
      * Since a private method on the class loader is invoked through the
      * reflection API, the caller must have permissions to do that.
-     * <p/>
-     * <p/>
+     * <p>
+     * <p>
      * An easy way to obtain <code>ProtectionDomain</code> object is to call
      * <code>getProtectionDomain()</code> in <code>java.lang.Class</code>. It
      * returns the domain that the class belongs to.
-     * <p/>
-     * <p/>
+     * <p>
+     * <p>
      * This method is provided for convenience. If you need more complex
      * functionality, you should write your own class loader.
      *
@@ -81,26 +84,26 @@ public class ClassFileUtils {
      * @param domain the protection domain for the class. If it is null, the
      *               default domain created by <code>java.lang.ClassLoader</code> is
      */
-    public static Class<?> toClass(ClassFile ct, ClassLoader loader, ProtectionDomain domain) {
+    public static Class<?> toClass(ClassFile ct, ClassLoader loader, Class<?> beanType) {
         try {
             byte[] b = ct.toBytecode();
             java.lang.reflect.Method method;
             Object[] args;
-            if (domain == null) {
-                method = defineClass1;
-                args = new Object[]{ct.getName(), b, 0, b.length};
-            } else {
-                method = defineClass2;
-                args = new Object[]{ct.getName(), b, 0, b.length, domain};
-            }
+            //if (domain == null) {
+            //            method = defineClass1;
+            args = new Object[] { b };
+            //            } else {
+            //                method = defineClass2;
+            //                args = new Object[]{ct.getName(), b, 0, b.length, domain};
+            //            }
+            System.out.println("BEAN TYPE CLASS " + beanType.getPackageName() + " " + ct.getName());
 
-            return toClass2(method, loader, args);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getTargetException());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            MethodHandles.Lookup in = MethodHandles.privateLookupIn(DummyClass.class, MethodHandles.lookup()).dropLookupMode(MethodHandles.Lookup.PRIVATE);
+
+            return in.defineClass(b);
+        } catch (IllegalAccessException e) {
+            new RuntimeException(e);
+            return null;
         }
     }
 
